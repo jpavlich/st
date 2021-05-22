@@ -6,7 +6,7 @@
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
 static char *font = "mono:pixelsize=12:antialias=true:autohint=true";
-static char *font2[] = { "JoyPixels:pixelsize=10:antialias=true:autohint=true" };
+static char *font2[] = { "JoyPixels:pixelsize=12:antialias=true:autohint=true" };
 static int borderpx = 2;
 
 /*
@@ -87,7 +87,8 @@ const int boxdraw_braille = 0;
 static int bellvolume = 0;
 
 /* default TERM value */
-char *termname = "st-256color";
+char *termname = "xterm-256color";
+// char *termname = "st-256color";
 
 /*
  * spaces per tab
@@ -107,13 +108,13 @@ char *termname = "st-256color";
 unsigned int tabspaces = 8;
 
 /* bg opacity */
-float alpha = 0.8;
+float alpha = 1.0;
 float alphaOffset = 0.0;
 float alphaUnfocus;
 
 /* Terminal colors (16 first used in escape sequence) */
 static const char *colorname[] = {
-	"#282828", /* hard contrast: #1d2021 / soft contrast: #32302f */
+	"#1d2021", /* hard contrast: #1d2021 / soft contrast: #32302f */
 	"#cc241d",
 	"#98971a",
 	"#d79921",
@@ -133,8 +134,8 @@ static const char *colorname[] = {
 	/* more colors can be added after 255 to use with DefaultXX */
 	"#add8e6", /* 256 -> cursor */
 	"#555555", /* 257 -> rev cursor*/
-	"#282828", /* 258 -> bg */
-	"#ebdbb2", /* 259 -> fg */
+	"#000000", /* 258 -> bg */
+	"#ffffff", /* 259 -> fg */
 };
 
 
@@ -206,9 +207,9 @@ ResourcePref resources[] = {
 		{ "color13",      STRING,  &colorname[13] },
 		{ "color14",      STRING,  &colorname[14] },
 		{ "color15",      STRING,  &colorname[15] },
-		{ "background",   STRING,  &colorname[258] },
-		{ "foreground",   STRING,  &colorname[259] },
-		{ "cursorColor",  STRING,  &colorname[256] },
+		{ "background",   STRING,  &colorname[0] },
+		{ "foreground",   STRING,  &colorname[15] },
+		{ "cursorColor",  STRING,  &colorname[3] },
 		{ "termname",     STRING,  &termname },
 		{ "shell",        STRING,  &shell },
 		{ "minlatency",   INTEGER, &minlatency },
@@ -249,41 +250,39 @@ static char *copyoutput[] = { "/bin/sh", "-c", "st-copyout", "externalpipe", NUL
 
 static Shortcut shortcuts[] = {
 	/* mask                 keysym          function        argument */
-	{ XK_ANY_MOD,           XK_Break,       sendbreak,      {.i =  0} },
-	{ ControlMask,          XK_Print,       toggleprinter,  {.i =  0} },
-	{ ShiftMask,            XK_Print,       printscreen,    {.i =  0} },
-	{ XK_ANY_MOD,           XK_Print,       printsel,       {.i =  0} },
-	{ TERMMOD,              XK_Prior,       zoom,           {.f = +1} },
-	{ TERMMOD,              XK_Next,        zoom,           {.f = -1} },
-	{ TERMMOD,              XK_Home,        zoomreset,      {.f =  0} },
-	{ TERMMOD,              XK_C,           clipcopy,       {.i =  0} },
-	{ TERMMOD,              XK_V,           clippaste,      {.i =  0} },
-	{ MODKEY,               XK_c,           clipcopy,       {.i =  0} },
-	{ ShiftMask,            XK_Insert,      clippaste,      {.i =  0} },
-	{ MODKEY,               XK_v,           clippaste,      {.i =  0} },
-	{ ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
-	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
+	{ ControlMask,          XK_equal,       zoom,           {.f = +1} },
+	{ ControlMask,          XK_minus,       zoom,           {.f = -1} },
 	{ ShiftMask,            XK_Page_Up,     kscrollup,      {.i = -1} },
 	{ ShiftMask,            XK_Page_Down,   kscrolldown,    {.i = -1} },
-	{ MODKEY,               XK_Page_Up,     kscrollup,      {.i = -1} },
-	{ MODKEY,               XK_Page_Down,   kscrolldown,    {.i = -1} },
-	{ MODKEY,               XK_k,           kscrollup,      {.i =  1} },
-	{ MODKEY,               XK_j,           kscrolldown,    {.i =  1} },
-	{ MODKEY,               XK_Up,          kscrollup,      {.i =  1} },
-	{ MODKEY,               XK_Down,        kscrolldown,    {.i =  1} },
-	{ MODKEY,               XK_u,           kscrollup,      {.i = -1} },
-	{ MODKEY,               XK_d,           kscrolldown,    {.i = -1} },
-	{ MODKEY,		XK_s,		changealpha,	{.f = -0.05} },
-	{ MODKEY,		XK_a,		changealpha,	{.f = +0.05} },
-	{ TERMMOD,              XK_Up,          zoom,           {.f = +1} },
-	{ TERMMOD,              XK_Down,        zoom,           {.f = -1} },
-	{ TERMMOD,              XK_K,           zoom,           {.f = +1} },
-	{ TERMMOD,              XK_J,           zoom,           {.f = -1} },
-	{ TERMMOD,              XK_U,           zoom,           {.f = +2} },
-	{ TERMMOD,              XK_D,           zoom,           {.f = -2} },
-	{ MODKEY,               XK_l,           externalpipe,   {.v = openurlcmd } },
-	{ MODKEY,               XK_y,           externalpipe,   {.v = copyurlcmd } },
-	{ MODKEY,               XK_o,           externalpipe,   {.v = copyoutput } },
+	{ ControlMask|ShiftMask,              XK_C,           clipcopy,       {.i =  0} },
+	{ ControlMask|ShiftMask,              XK_V,           clippaste,      {.i =  0} },
+	{ ControlMask|ShiftMask,               XK_c,           clipcopy,       {.i =  0} },
+	{ ControlMask|ShiftMask,               XK_v,           clippaste,      {.i =  0} },
+	// { XK_ANY_MOD,           XK_Break,       sendbreak,      {.i =  0} },
+	// { ControlMask,          XK_Print,       toggleprinter,  {.i =  0} },
+	// { ShiftMask,            XK_Print,       printscreen,    {.i =  0} },
+	// { XK_ANY_MOD,           XK_Print,       printsel,       {.i =  0} },
+	// { TERMMOD,              XK_Home,        zoomreset,      {.f =  0} },
+	// { TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
+	// { MODKEY,               XK_Page_Up,     kscrollup,      {.i = -1} },
+	// { MODKEY,               XK_Page_Down,   kscrolldown,    {.i = -1} },
+	// { MODKEY,               XK_k,           kscrollup,      {.i =  1} },
+	// { MODKEY,               XK_j,           kscrolldown,    {.i =  1} },
+	// { MODKEY,               XK_Up,          kscrollup,      {.i =  1} },
+	// { MODKEY,               XK_Down,        kscrolldown,    {.i =  1} },
+	// { MODKEY,               XK_u,           kscrollup,      {.i = -1} },
+	// { MODKEY,               XK_d,           kscrolldown,    {.i = -1} },
+	// { MODKEY,		XK_s,		changealpha,	{.f = -0.05} },
+	// { MODKEY,		XK_a,		changealpha,	{.f = +0.05} },
+	// { TERMMOD,              XK_Up,          zoom,           {.f = +1} },
+	// { TERMMOD,              XK_Down,        zoom,           {.f = -1} },
+	// { TERMMOD,              XK_K,           zoom,           {.f = +1} },
+	// { TERMMOD,              XK_J,           zoom,           {.f = -1} },
+	// { TERMMOD,              XK_U,           zoom,           {.f = +2} },
+	// { TERMMOD,              XK_D,           zoom,           {.f = -2} },
+	// { MODKEY,               XK_l,           externalpipe,   {.v = openurlcmd } },
+	// { MODKEY,               XK_y,           externalpipe,   {.v = copyurlcmd } },
+	// { MODKEY,               XK_o,           externalpipe,   {.v = copyoutput } },
 };
 
 /*
